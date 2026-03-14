@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Keyboard Shortcuts Masterclass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Chart container constraint as requested */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Kbd style mimic physical keys */
+        kbd {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            line-height: 1;
+            color: #334155;
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-bottom-width: 2px;
+            border-radius: 0.375rem;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
+        }
+
+        .toast-notification {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden selection:bg-brand-100 selection:text-brand-900">
+
+    <!-- Chosen Palette: Warm Neutrals with Sky Blue Accents (Slate/Sky) -->
+    
+    <!-- Application Structure Plan: 
+         1. Header: Sets the context and topic.
+         2. Analytical Section ("The Efficiency Landscape"): Uses a Chart.js visualization to break down the types of shortcuts, adding a quantitative layer to what is usually just qualitative data.
+         3. Interactive Explorer ("The Shortcut Finder"): The core utility. Uses a two-column layout on desktop (Filters on left, Grid on right) to allow users to quickly drill down by category or text search.
+         This structure was chosen to transform a static list into an interactive database, making discovery active rather than passive. -->
+
+    <!-- Visualization & Content Choices:
+         - Goal: Understand shortcut distribution -> Viz: Doughnut Chart (Chart.js) -> Interaction: Hover for exact counts -> Justification: Shows users where Windows invests its shortcut real estate (Window management vs Text).
+         - Goal: Find specific commands -> Viz: Interactive Card Grid -> Interaction: Search bar & Category pills -> Justification: Allows instant filtering of dozens of items without page reloads.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-lg z-50 flex items-center gap-2">
+        <span>&#10003;</span>
+        <span id="toast-msg">Copied to clipboard!</span>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Windows Productivity <span class="text-brand-600">Masterclass</span>
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                Stop relying on your mouse. This interactive guide translates the essential Windows keyboard commands into an easily explorable database. Master these combinations to navigate your digital workspace at the speed of thought.
+            </p>
+        </header>
+
+        <!-- Section 1: Data Analytics -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-12">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">The Efficiency Landscape</h2>
+                <p class="text-slate-600">
+                    Understanding the anatomy of Windows shortcuts helps conceptualize how the operating system is built to be navigated. Below is a breakdown of the command categories we will explore in this report. Notice the heavy emphasis on System Navigation and Window Management.
+                </p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center gap-8">
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <!-- Chart Container mapped to constraints -->
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4">Key Observations</h3>
+                    <ul class="space-y-4 text-slate-600">
+                        <li class="flex items-start">
+                            <span class="text-brand-500 font-bold mr-2">&#8226;</span>
+                            <div><strong>Window Management Dominates:</strong> A large portion of essential shortcuts revolve around snapping, minimizing, and organizing your visual workspace.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-brand-500 font-bold mr-2">&#8226;</span>
+                            <div><strong>The 'Win' Key Evolution:</strong> Modern Windows relies heavily on the Windows key as a primary modifier, shifting away from legacy Alt/Ctrl combinations for system-level actions.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-brand-500 font-bold mr-2">&#8226;</span>
+                            <div><strong>Virtual Desktops:</strong> Essential for power users, these shortcuts isolate workflows and reduce desktop clutter without needing multiple physical monitors.</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Interactive Explorer -->
+        <section class="mb-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-2">Interactive Shortcut Explorer</h2>
+                <p class="text-slate-600 max-w-3xl">
+                    Use the controls below to filter and search through the core Windows shortcuts. Click on any shortcut card to copy its description and key combination to your clipboard for easy sharing or note-taking.
+                </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Filters Sidebar -->
+                <aside class="w-full lg:w-1/4 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 self-start sticky top-6">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 uppercase tracking-wider text-sm">Controls</h3>
+                    
+                    <!-- Search -->
+                    <div class="mb-6">
+                        <label for="searchInput" class="block text-sm font-medium text-slate-700 mb-2">Search Commands</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                &#128269; <!-- Magnifying glass unicode -->
+                            </span>
+                            <input type="text" id="searchInput" placeholder="e.g., 'Task Manager' or 'Win'" class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow">
+                        </div>
+                    </div>
+
+                    <!-- Category Toggles -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Filter by Category</label>
+                        <div id="category-filters" class="flex flex-wrap gap-2">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Grid -->
+                <div class="w-full lg:w-3/4">
+                    <!-- Status / Results Count -->
+                    <div class="mb-4 flex justify-between items-center text-sm text-slate-500">
+                        <span id="results-count">Showing all shortcuts</span>
+                        <button id="clear-filters" class="text-brand-600 hover:text-brand-800 hover:underline hidden">Clear Filters</button>
+                    </div>
+
+                    <!-- Cards Container -->
+                    <div id="shortcuts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Cards populated via JS -->
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-dashed border-slate-300">
+                        <span class="text-4xl mb-4">&#128584;</span>
+                        <h3 class="text-lg font-medium text-slate-900">No shortcuts found</h3>
+                        <p class="text-slate-500 mt-1">Try adjusting your search terms or filters.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // --- 1. Data Storage ---
+        const shortcutsData = [
+            // General
+            { category: "General", keys: ["Ctrl", "C"], action: "Copy the selected item." },
+            { category: "General", keys: ["Ctrl", "X"], action: "Cut the selected item." },
+            { category: "General", keys: ["Ctrl", "V"], action: "Paste the selected item." },
+            { category: "General", keys: ["Ctrl", "Z"], action: "Undo an action." },
+            { category: "General", keys: ["Ctrl", "Y"], action: "Redo an action." },
+            { category: "General", keys: ["Alt", "Tab"], action: "Switch between open apps." },
+            { category: "General", keys: ["Alt", "F4"], action: "Close the active item, or exit the active app." },
+            { category: "General", keys: ["Shift", "Delete"], action: "Delete selected item without moving to Recycle Bin first." },
+            
+            // System & Window Management (Win Key)
+            { category: "System & Window", keys: ["Win"], action: "Open or close Start." },
+            { category: "System & Window", keys: ["Win", "D"], action: "Display and hide the desktop." },
+            { category: "System & Window", keys: ["Win", "E"], action: "Open File Explorer." },
+            { category: "System & Window", keys: ["Win", "I"], action: "Open Settings." },
+            { category: "System & Window", keys: ["Win", "L"], action: "Lock your PC or switch accounts." },
+            { category: "System & Window", keys: ["Win", "M"], action: "Minimize all windows." },
+            { category: "System & Window", keys: ["Win", "V"], action: "Open the clipboard bin/history." },
+            { category: "System & Window", keys: ["Win", ".", "(Period)"], action: "Open emoji panel." },
+            { category: "System & Window", keys: ["Win", "Shift", "S"], action: "Take a screenshot using Snipping Tool." },
+            { category: "System & Window", keys: ["Win", "&#8592;"], action: "Snap app or window to the left." },
+            { category: "System & Window", keys: ["Win", "&#8594;"], action: "Snap app or window to the right." },
+            
+            // Virtual Desktops
+            { category: "Virtual Desktops", keys: ["Win", "Tab"], action: "Open Task View." },
+            { category: "Virtual Desktops", keys: ["Win", "Ctrl", "D"], action: "Add a virtual desktop." },
+            { category: "Virtual Desktops", keys: ["Win", "Ctrl", "&#8594;"], action: "Switch between virtual desktops you've created on the right." },
+            { category: "Virtual Desktops", keys: ["Win", "Ctrl", "&#8592;"], action: "Switch between virtual desktops you've created on the left." },
+            { category: "Virtual Desktops", keys: ["Win", "Ctrl", "F4"], action: "Close the virtual desktop you're using." },
+
+            // File Explorer
+            { category: "File Explorer", keys: ["Alt", "D"], action: "Select the address bar." },
+            { category: "File Explorer", keys: ["Ctrl", "E"], action: "Select the search box." },
+            { category: "File Explorer", keys: ["Ctrl", "N"], action: "Open a new window." },
+            { category: "File Explorer", keys: ["Ctrl", "W"], action: "Close the active window." },
+            { category: "File Explorer", keys: ["F2"], action: "Rename the selected item." },
+
+            // Advanced / Power User
+            { category: "Power User", keys: ["Ctrl", "Shift", "Esc"], action: "Open Task Manager." },
+            { category: "Power User", keys: ["Win", "X"], action: "Open the Quick Link menu (Start context menu)." },
+            { category: "Power User", keys: ["Win", "R"], action: "Open the Run dialog box." }
+        ];
+
+        // --- 2. State Management ---
+        const state = {
+            searchQuery: "",
+            activeCategory: "All"
+        };
+
+        // Derived categories for UI
+        const categories = ["All", ...new Set(shortcutsData.map(s => s.category))];
+
+        // --- 3. DOM Elements ---
+        const gridEl = document.getElementById('shortcuts-grid');
+        const filtersEl = document.getElementById('category-filters');
+        const searchInput = document.getElementById('searchInput');
+        const resultsCountEl = document.getElementById('results-count');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const emptyStateEl = document.getElementById('empty-state');
+        const toastEl = document.getElementById('toast');
+
+        // --- 4. Initialization & Rendering ---
+        function init() {
+            renderCategoryFilters();
+            renderCards();
+            initChart();
+            setupEventListeners();
+        }
+
+        function renderCategoryFilters() {
+            filtersEl.innerHTML = '';
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1.5 text-sm rounded-full border transition-colors duration-200 ${
+                    state.activeCategory === cat 
+                        ? 'bg-brand-600 text-white border-brand-600 font-medium shadow-sm' 
+                        : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50 hover:border-slate-400'
+                }`;
+                btn.textContent = cat;
+                btn.onclick = () => {
+                    state.activeCategory = cat;
+                    renderCategoryFilters(); // Update active state
+                    renderCards();
+                };
+                filtersEl.appendChild(btn);
+            });
+        }
+
+        function renderCards() {
+            // Apply Filters
+            const filteredData = shortcutsData.filter(item => {
+                const matchesCategory = state.activeCategory === "All" || item.category === state.activeCategory;
+                
+                const searchStr = state.searchQuery.toLowerCase();
+                const matchesSearch = item.action.toLowerCase().includes(searchStr) || 
+                                      item.keys.join(' ').toLowerCase().includes(searchStr);
+                
+                return matchesCategory && matchesSearch;
+            });
+
+            // Update UI
+            gridEl.innerHTML = '';
+            
+            if (filteredData.length === 0) {
+                gridEl.classList.add('hidden');
+                emptyStateEl.classList.remove('hidden');
+            } else {
+                gridEl.classList.remove('hidden');
+                emptyStateEl.classList.add('hidden');
+                
+                filteredData.forEach(item => {
+                    const card = document.createElement('div');
+                    // Add interactivity styling
+                    card.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group flex flex-col justify-between";
+                    
+                    // Format keys
+                    const keysHtml = item.keys.map((k, idx) => {
+                        const plusStr = idx < item.keys.length - 1 ? `<span class="text-slate-400 font-bold px-1">+</span>` : '';
+                        return `<kbd>${k}</kbd>${plusStr}`;
+                    }).join('');
+
+                    card.innerHTML = `
+                        <div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-brand-500 mb-2 block">${item.category}</span>
+                            <p class="text-slate-800 font-medium mb-4 group-hover:text-brand-700 transition-colors">${item.action}</p>
+                        </div>
+                        <div class="flex items-center flex-wrap gap-y-2 mt-auto">
+                            ${keysHtml}
+                        </div>
+                        <div class="absolute inset-0 bg-brand-50 opacity-0 group-hover:opacity-10 pointer-events-none rounded-xl transition-opacity"></div>
+                    `;
+
+                    // Copy to clipboard interaction
+                    card.onclick = () => {
+                        const plainKeys = item.keys.map(k => k.replace(/&#[0-9]+;/g, '').trim()).join(' + '); // crude strip of arrows for copy text, better UX
+                        const textToCopy = `${item.action} : ${item.keys.join(' + ').replace(/&#8592;/g, 'Left Arrow').replace(/&#8594;/g, 'Right Arrow')}`;
+                        copyToClipboard(textToCopy);
+                    };
+
+                    gridEl.appendChild(card);
+                });
+            }
+
+            // Update meta text
+            resultsCountEl.textContent = `Showing ${filteredData.length} shortcut${filteredData.length !== 1 ? 's' : ''}`;
+            
+            if (state.searchQuery !== "" || state.activeCategory !== "All") {
+                clearFiltersBtn.classList.remove('hidden');
+            } else {
+                clearFiltersBtn.classList.add('hidden');
+            }
+        }
+
+        // --- 5. Event Listeners ---
+        function setupEventListeners() {
+            searchInput.addEventListener('input', (e) => {
+                state.searchQuery = e.target.value;
+                renderCards();
+            });
+
+            clearFiltersBtn.addEventListener('click', () => {
+                state.searchQuery = "";
+                searchInput.value = "";
+                state.activeCategory = "All";
+                renderCategoryFilters();
+                renderCards();
+            });
+        }
+
+        // --- 6. Utilities & Interaction ---
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast();
+            }).catch(err => {
+                // Fallback for older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast();
+                } catch (err) {
+                    console.error('Failed to copy', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        let toastTimeout;
+        function showToast() {
+            toastEl.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2500);
+        }
+
+        // --- 7. Chart.js Implementation ---
+        function initChart() {
+            // Calculate category frequencies for chart
+            const counts = {};
+            shortcutsData.forEach(item => {
+                counts[item.category] = (counts[item.category] || 0) + 1;
+            });
+
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
+
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#0ea5e9', // brand-500
+                            '#cbd5e1', // slate-300
+                            '#3b82f6', // blue-500
+                            '#64748b', // slate-500
+                            '#bae6fd'  // brand-200
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Important for container constraints
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#475569',
+                                font: {
+                                    family: 'sans-serif',
+                                    size: 13
+                                },
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw} shortcuts`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%',
+                    layout: {
+                        padding: 10
+                    }
+                }
+            });
+        }
+
+        // Run application
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
