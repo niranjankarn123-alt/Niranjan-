@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Grill | Culinary Excellence</title>
+    <style>
+        :root {
+            --black: #050505;
+            --dark: #121212;
+            --gold: #D4AF37;
+            --text: #f0f0f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--black); color: var(--text); font-family: 'Garamond', serif; overflow-x: hidden; }
+
+        /* NAVIGATION BAR */
+        nav {
+            background: rgba(5, 5, 5, 0.98);
+            border-bottom: 1px solid #222;
+            padding: 1.2rem 5%;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { color: var(--gold); font-size: 1.8rem; font-weight: bold; text-decoration: none; letter-spacing: 3px; cursor: pointer; }
+        .nav-links a {
+            color: var(--text); text-decoration: none; margin-left: 30px;
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s; cursor: pointer;
+        }
+        .nav-links a:hover { color: var(--gold); }
+
+        /* PAGE DISPLAY ENGINE */
+        .page { display: none; min-height: 100vh; width: 100%; padding-top: 80px; }
+        .active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 1. HOME VIEW */
+        #home-view {
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover; background-position: center;
+            display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            padding-top: 0;
+        }
+        #home-view.active { display: flex; }
+        .hero-title { color: var(--gold); font-size: clamp(3rem, 10vw, 6rem); letter-spacing: 15px; margin: 0; }
+
+        /* 2. MENU VIEW (FOLDER SYSTEM) */
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .folder-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .folder {
+            background: var(--dark); border: 1px solid #222; padding: 60px 20px;
+            text-align: center; cursor: pointer; border-top: 4px solid var(--gold); transition: 0.3s;
+        }
+        .folder:hover { transform: translateY(-8px); border-color: var(--gold); background: #1a1a1a; }
+        .folder h3 { color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+
+        /* MENU CONTENT DISPLAY */
+        #cuisine-items-view { display: none; }
+        .back-btn { color: var(--gold); cursor: pointer; margin-bottom: 25px; display: inline-block; border-bottom: 1px solid var(--gold); }
+        .menu-cat { color: var(--gold); border-bottom: 1px solid #333; margin: 30px 0 10px; padding-bottom: 5px; font-size: 1.4rem; }
+        .menu-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dotted #333; }
+        .price { color: var(--gold); font-weight: bold; }
+
+        /* 3. BOOKING VIEW */
+        .form-card { background: var(--dark); padding: 40px; border: 1px solid var(--gold); max-width: 500px; margin: 40px auto; }
+        .form-card input { 
+            width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; border-radius: 4px;
+        }
+        .submit-btn { width: 100%; padding: 15px; background: var(--gold); border: none; font-weight: bold; cursor: pointer; color: black; margin-top: 10px;}
+
+        /* 4. REVIEWS VIEW */
+        .review-card { background: var(--dark); padding: 30px; margin-bottom: 25px; border-left: 5px solid var(--gold); }
+        .stars { color: #FFD700; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo" onclick="showPage('home-view')">GOLDEN GRILL</div>
+        <div class="nav-links">
+            <a onclick="showPage('home-view')">Home</a>
+            <a onclick="showPage('menu-view')">Menu</a>
+            <a onclick="showPage('book-view')">Book a Table</a>
+            <a onclick="showPage('review-view')">Review</a>
+        </div>
+    </nav>
+
+    <div id="home-view" class="page active">
+        <h1 class="hero-title">GOLDEN GRILL</h1>
+        <p style="letter-spacing: 5px; margin-top: 20px;">A SYMPHONY OF FLAVORS</p>
+    </div>
+
+    <div id="menu-view" class="page">
+        <div class="container">
+            <div id="cuisine-folder-view">
+                <h2 style="text-align: center; color: var(--gold); margin-bottom: 40px; letter-spacing: 5px;">WORLD CUISINES</h2>
+                <div class="folder-grid">
+                    <div class="folder" onclick="openCuisine('Indian')"><h3>Indian</h3></div>
+                    <div class="folder" onclick="openCuisine('Italian')"><h3>Italian</h3></div>
+                    <div class="folder" onclick="openCuisine('Nepali')"><h3>Nepali</h3></div>
+                    <div class="folder" onclick="openCuisine('American')"><h3>American</h3></div>
+                    <div class="folder" onclick="openCuisine('Korean')"><h3>Korean</h3></div>
+                    <div class="folder" onclick="openCuisine('Japanese')"><h3>Japanese</h3></div>
+                    <div class="folder" onclick="openCuisine('Chinese')"><h3>Chinese</h3></div>
+                    <div class="folder" onclick="openCuisine('French')"><h3>French</h3></div>
+                </div>
+            </div>
+
+            <div id="cuisine-items-view">
+                <div class="back-btn" onclick="backToFolders()">← BACK TO CUISINES</div>
+                <h2 id="current-cuisine-title" style="color: var(--gold); font-size: 2.5rem; text-transform: uppercase;"></h2>
+                <div id="menu-content-target"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="book-view" class="page">
+        <div class="container">
+            <h2 style="text-align: center; color: var(--gold); letter-spacing: 3px;">RESERVE A TABLE</h2>
+            <div class="form-card">
+                <form onsubmit="alert('Reservation Submitted! We will contact you shortly.'); showPage('home-view'); return false;">
+                    <input type="number" placeholder="Number of Members" required>
+                    <input type="tel" placeholder="Contact Number" required>
+                    <input type="email" placeholder="Email Address" required>
+                    <input type="time" required>
+                    <button type="submit" class="submit-btn">CONFIRM BOOKING</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="review-view" class="page">
+        <div class="container">
+            <h2 style="text-align: center; color: var(--gold); margin-bottom: 40px; letter-spacing: 3px;">GUEST REVIEWS</h2>
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>"Exceptional Indian cuisine. The Biryani is legendary!"</p>
+                <small style="color: var(--gold); font-weight: bold;">- Rohan Mehta</small>
+            </div>
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>"Best Nepali Momo in the city. The Thakali set is truly authentic."</p>
+                <small style="color: var(--gold); font-weight: bold;">- Srijana K.</small>
+            </div>
+            <div class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>"The French Onion Soup and wine selection are world-class."</p>
+                <small style="color: var(--gold); font-weight: bold;">- Julian D.</small>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MASTER MENU DATABASE
+        const masterMenu = {
+            'Indian': {
+                'Main Dishes': {'Biryani':750,'Butter Chicken':650,'Paneer Tikka Masala':550,'Rogan Josh':780,'Chole Bhature':350,'Dal Makhani':420,'Palak Paneer':450,'Masala Dosa':250,'Hyderabadi Haleem':580,'Fish Curry':700},
+                'Breads & Rice': {'Naan':60,'Roti':30,'Paratha':80,'Kulcha':90,'Jeera Rice':220,'Pulao':280,'Idli':180,'Appam':200},
+                'Street Food': {'Samosa':60,'Pani Puri':100,'Vada Pav':80,'Aloo Tikki':120,'Dhokla':150,'Pakora':140,'Papdi Chaat':130,'Pav Bhaji':220},
+                'Desserts': {'Gulab Jamun':150,'Rasgulla':120,'Jalebi':100,'Kheer':180,'Gajar Halwa':220,'Kaju Katli':280,'Ras Malai':200,'Laddu':150},
+                'Drinks': {'Masala Chai':60,'Lassi':150,'Thandai':180,'Aam Panna':140,'Filter Coffee':90}
+            },
+            'Italian': {
+                'Pasta & Grains': {'Lasagna':850,'Carbonara':750,'Fettuccine Alfredo':720,'Penne alla Vodka':680,'Spaghetti Bolognese':780,'Ravioli':750,'Gnocchi':680,'Risotto':850,'Polenta':550},
+                'Pizza & Breads': {'Margherita Pizza':580,'Marinara Pizza':500,'Calzone':650,'Focaccia':350,'Ciabatta':280,'Bruschetta':320},
+                'Main Courses': {'Chicken Parmigiana':850,'Osso Buco':1200,'Bistecca Fiorentina':1500,'Saltimbocca':950,'Chicken Piccata':780,'Calamari Fritti':750,'Cacciatore':820,'Veal Marsala':1100},
+                'Appetizers': {'Caprese Salad':450,'Antipasto':650,'Arancini':480,'Burrata':720},
+                'Desserts': {'Tiramisu':480,'Panna Cotta':420,'Gelato':350,'Cannoli':400,'Biscotti':250,'Affogato':320},
+                'Drinks': {'Espresso':150,'Cappuccino':220,'Limoncello':550,'Negroni':750,'Aperol Spritz':680}
+            },
+            'Nepali': {
+                'Main Meals': {'Dal Bhat':450,'Dhido':400,'Gundruk':180,'Tarkari':250,'Achar':100,'Sel Roti':150},
+                'Specialties': {'Momo (Buff/Chic/Veg)':280,'Thakali Khana':750,'Samay Baji':650,'Yomari':180,'Chatamari':250,'Choila':380,'Sekuwa':450,'Thukpa':320,'Kwati':280},
+                'Street Food': {'Chatpate':120,'Panipuri':100,'Aloo Dum':150,'Laphing':180,'Pakauda':140,'Sukuti':350},
+                'Desserts': {'Jeri':120,'Kheer':180,'Lalmon':150,'Gud-Pak':250},
+                'Drinks': {'Masala Tea':60,'Lassi':150,'Chhyang':350,'Raksi':450,'Aila':500,'Butter Tea':120}
+            },
+            'American': {
+                'Main Meals': {'Cheeseburger':550,'Hot Dog':320,'Fried Chicken':680,'BBQ Ribs':1250,'Buffalo Wings':520,'Meatloaf':750,'Roast Turkey':1100,'Philly Cheesesteak':680},
+                'Regional': {'Cajun Jambalaya':850,'Gumbo':780,'Clam Chowder':620,'Chicago Deep Dish':950,'Lobster Roll':1400,'Biscuits & Gravy':450},
+                'Sides': {'French Fries':250,'Mac and Cheese':480,'Potato Salad':220,'Onion Rings':280},
+                'Desserts': {'Apple Pie':450,'Chocolate Chip Cookies':250,'Brownies':300,'NY Cheesecake':550,'Smores':320,'Pancakes':380},
+                'Drinks': {'Root Beer Float':280,'Milkshake':350,'Iced Tea':180,'Lemonade':150,'Bourbon':850}
+            },
+            'Korean': {
+                'Rice & Noodles': {'Bibimbap':650,'Kimchi Fried Rice':550,'Japchae':620,'Jajangmyeon':680,'Jjamppong':720,'Naengmyeon':650},
+                'Meat & BBQ': {'Bulgogi':850,'Galbi':1150,'Samgyeopsal':980,'Korean Fried Chicken':720,'Dakgalbi':780},
+                'Soups': {'Kimchi-jjigae':580,'Doenjang-jjigae':550,'Sundubu-jjigae':600,'Samgyetang':950},
+                'Street Food': {'Tteokbokki':450,'Gimbap':380,'Pajeon':420,'Mandu':350,'Sundae':450},
+                'Desserts': {'Bingsu':480,'Hotteok':250,'Sikhye':220,'Soju':850,'Banana Milk':220}
+            },
+            'Japanese': {
+                'Rice & Noodles': {'Sushi Platter':1350,'Sashimi':1500,'Ramen':750,'Udon':680,'Soba':650,'Donburi':620,'Onigiri':250},
+                'Main Dishes': {'Tempura':780,'Yakitori':550,'Tonkatsu':680,'Sukiyaki':1200,'Shabu-shabu':1300,'Karaage':620,'Gyoza':450},
+                'Teppan': {'Okonomiyaki':650,'Takoyaki':480},
+                'Soups/Sides': {'Miso Soup':180,'Edamame':220,'Chawanmushi':350,'Agedashi Tofu':320},
+                'Desserts': {'Mochi':350,'Matcha Ice Cream':280,'Taiyaki':250,'Dorayaki':280},
+                'Drinks': {'Matcha Tea':150,'Sake':950,'Highball':650}
+            },
+            'Chinese': {
+                'Main Dishes': {'Peking Duck':1850,'Kung Pao Chicken':650,'Sweet & Sour Pork':580,'Mapo Tofu':480,'Char Siu':720,'Beef with Broccoli':750},
+                'Dim Sum': {'Xiaolongbao':450,'Shumai':420,'Har Gow':480,'Spring Rolls':320,'Wontons':350,'Potstickers':380},
+                'Noodles/Rice': {'Chow Mein':420,'Lo Mein':420,'Dan Dan Noodles':480,'Yangzhou Fried Rice':450},
+                'Soups/Sides': {'Hot and Sour Soup':250,'Egg Drop Soup':220,'Stir-fried Bok Choy':380},
+                'Desserts': {'Tangyuan':280,'Mooncake':350,'Egg Tarts':280,'Bubble Tea':280}
+            },
+            'French': {
+                'Main Courses': {'Coq au Vin':1200,'Boeuf Bourguignon':1450,'Duck Confit':1350,'Steak Frites':1550,'Cassoulet':1400,'Pot-au-Feu':1250},
+                'Seafood': {'Bouillabaisse':950,'Sole Meunière':1100,'Moules-Frites':850,'Escargots':850},
+                'Vegetables': {'Ratatouille':650,'Gratin Dauphinois':550,'French Onion Soup':480,'Salade Niçoise':580},
+                'Pastries/Eggs': {'Quiche Lorraine':550,'Croque Monsieur':520,'Cheese Soufflé':650,'Galette':480},
+                'Breads/Desserts': {'Baguette':150,'Croissant':180,'Crème Brûlée':520,'Macarons':580,'Tarte Tatin':620,'Éclair':350,'Crêpes Suzette':450},
+                'Drinks': {'Bordeaux Wine':2500,'Champagne':4500,'Cognac':1200,'Café au Lait':250}
+            }
+        };
+
+        // NAVIGATION ENGINE
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            // Reset menu view if navigating to menu page
+            if(pageId === 'menu-view') backToFolders();
+            // Scroll to top
+            window.scrollTo(0,0);
+        }
+
+        // CUISINE FOLDER LOGIC
+        function openCuisine(cuisineName) {
+            document.getElementById('cuisine-folder-view').style.display = 'none';
+            document.getElementById('cuisine-items-view').style.display = 'block';
+            document.getElementById('current-cuisine-title').innerText = cuisineName + " Cuisine";
+            
+            const target = document.getElementById('menu-content-target');
+            target.innerHTML = '';
+            
+            const categories = masterMenu[cuisineName];
+            for(let catName in categories) {
+                let html = `<h3 class="menu-cat">${catName}</h3>`;
+                for(let itemName in categories[catName]) {
+                    html += `<div class="menu-row"><span>${itemName}</span><span class="price">₹${categories[catName][itemName]}</span></div>`;
+                }
+                target.innerHTML += html;
+            }
+            window.scrollTo(0,0);
+        }
+
+        function backToFolders() {
+            document.getElementById('cuisine-items-view').style.display = 'none';
+            document.getElementById('cuisine-folder-view').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
