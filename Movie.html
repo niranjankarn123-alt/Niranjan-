@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Stream</title>
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --surface: #111111;
+            --accent: #ffcc00;
+            --text-main: #ffffff;
+            --glow-color: rgba(255, 204, 0, 0.7);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Full Screen Dim Overlay */
+        #dim-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.5s ease;
+            z-index: 1100;
+        }
+
+        body.dimmed #dim-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Header - Transparent over Full Image */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 5%;
+            position: fixed;
+            width: 90%;
+            z-index: 2000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--accent), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px var(--glow-color));
+            animation: shine 4s linear infinite, pulse 2s ease-in-out infinite alternate;
+            cursor: pointer;
+        }
+
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes pulse { from { filter: drop-shadow(0 0 10px var(--glow-color)); } to { filter: drop-shadow(0 0 25px var(--glow-color)) brightness(1.3); } }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-right: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            transition: 0.3s;
+        }
+
+        nav a:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+
+        /* FULL SCREEN SLIDER */
+        #landing-view {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .slide.active { opacity: 1; }
+
+        .slide-overlay {
+            background: radial-gradient(circle at center, transparent, rgba(0,0,0,0.4), rgba(0,0,0,0.9));
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .slide-overlay h1 {
+            font-size: 5rem;
+            margin: 0;
+            letter-spacing: 10px;
+            text-shadow: 0 5px 20px rgba(0,0,0,1);
+        }
+
+        /* Auth Containers */
+        .container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2500;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 50px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            text-align: center;
+            box-shadow: 0 0 60px #000;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            margin: 15px 0;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            margin-top: 20px;
+            background: var(--accent);
+            border: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.4s;
+        }
+
+        button:hover { background: #fff; transform: scale(1.05); box-shadow: 0 0 30px var(--accent); }
+
+        /* MOVIE GRID SECTION */
+        #movie-library {
+            display: none;
+            padding: 140px 5% 60px;
+            background: var(--bg-dark);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .movie-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: 0.4s;
+            cursor: pointer;
+            border: 1px solid #222;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(255, 204, 0, 0.3);
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 15px;
+            background: #111;
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+    </style>
+</head>
+<body id="main-body">
+
+    <div id="dim-overlay"></div>
+
+    <header>
+        <nav id="main-nav">
+            <a onclick="location.reload()">HOME</a>
+            <a id="auth-link" onclick="toggleAuth('login-page', true)">SIGN IN / SIGN UP</a>
+        </nav>
+        <div class="logo">SHIFT STREAM</div>
+    </header>
+
+    <section id="landing-view">
+        <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2000')">
+            <div class="slide-overlay">
+                <h1>CINEMATIC</h1>
+                <p style="color: var(--accent); letter-spacing: 5px;">THE ULTIMATE FREE STREAMING HUB</p>
+            </div>
+        </div>
+        <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2000')">
+            <div class="slide-overlay">
+                <h1>UNLIMITED</h1>
+                <p style="color: var(--accent); letter-spacing: 5px;">THOUSANDS OF MOVIES AT YOUR FINGERTIPS</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="login-page" class="container">
+        <div class="card">
+            <h2 style="letter-spacing: 3px;">SIGN IN</h2>
+            <input type="text" placeholder="Email or Username">
+            <input type="password" placeholder="Password">
+            <button onclick="handleLogin()">Get Started</button>
+            <p style="margin-top:20px; font-size: 0.8rem; color: #888; cursor: pointer;" onclick="showPage('create-account-page')">Don't have an account? <span style="color: var(--accent)">Create one</span></p>
+        </div>
+    </section>
+
+    <section id="create-account-page" class="container">
+        <div class="card">
+            <h2 style="letter-spacing: 3px;">JOIN US</h2>
+            <button style="background: white; color: black; margin-bottom: 10px;" onclick="handleLogin()">Google</button>
+            <button style="background: #1877f2; color: white;" onclick="handleLogin()">Facebook</button>
+        </div>
+    </section>
+
+    <section id="movie-library">
+        <h2 style="margin-bottom: 40px; letter-spacing: 4px; border-left: 5px solid var(--accent); padding-left: 20px;">EXPLORE MOVIES</h2>
+        <div class="grid" id="movie-grid"></div>
+    </section>
+
+    <script>
+        // 1. Full-Screen Slider Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+
+        // 2. Navigation & UI Controls
+        function toggleAuth(pageId, show) {
+            document.getElementById('main-body').classList.toggle('dimmed', show);
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            if (show) document.getElementById(pageId).style.display = 'block';
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        function handleLogin() {
+            // UI Cleanup
+            document.getElementById('landing-view').style.display = 'none';
+            document.getElementById('main-body').classList.remove('dimmed');
+            document.getElementById('auth-link').style.display = 'none';
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            
+            // Activate Movie Grid
+            document.getElementById('movie-library').style.display = 'block';
+            loadMovies(50); // Initial load
+        }
+
+        // 3. Dynamic Movie Loader
+        function loadMovies(count) {
+            const grid = document.getElementById('movie-grid');
+            const genres = ["ACTION", "DRAMA", "SCI-FI", "THRILLER", "HORROR"];
+            for (let i = 0; i < count; i++) {
+                const genre = genres[i % genres.length];
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <img src="https://picsum.photos/seed/${i + 500}/400/600" alt="Poster">
+                    <div class="movie-info">
+                        <div style="color: var(--accent); font-size: 0.7rem; margin-bottom: 5px;">${genre}</div>
+                        MOVIE TITLE ${i + 1}
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+    </script>
+</body>
+</html>
